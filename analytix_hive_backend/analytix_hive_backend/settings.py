@@ -10,23 +10,54 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
+import environ
 from datetime import timedelta
+from pathlib import Path
+
+# Initialize environment variables
+env = environ.Env(
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(list, []),
+    CORS_ALLOWED_ORIGINS=(list, []),
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# Take environment variables from .env file
+environ.Env.read_env(BASE_DIR / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-72p3fkw^8u(29@&9s1*((3)$trm+c^+o2e_*)_(0&i+2f_w6mi"
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+
+# CORS configuration
+CORS_ALLOWED_ORIGINS = env('CORS_ALLOWED_ORIGINS')
+CORS_ALLOW_CREDENTIALS = True
+
+# Security Settings
+SECURE_SSL_REDIRECT = not DEBUG  # Redirect all HTTP to HTTPS in production
+SESSION_COOKIE_SECURE = not DEBUG  # Cookie only via HTTPS in production
+CSRF_COOKIE_SECURE = not DEBUG  # CSRF cookie only via HTTPS in production
+SECURE_BROWSER_XSS_FILTER = True  # Enable XSS filtering
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME type sniffing
+X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
+SECURE_HSTS_SECONDS = 31536000  # Enable HSTS (one year)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # HSTS for subdomains too
+SECURE_HSTS_PRELOAD = True  # Allow preloading of HSTS
+
+# JWT Settings
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=env.int('JWT_ACCESS_TOKEN_LIFETIME_MINUTES', 15)),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=env.int('JWT_REFRESH_TOKEN_LIFETIME_DAYS', 7)),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+}
 
 
 # Application definition
@@ -140,12 +171,4 @@ REST_FRAMEWORK = {
         'login': '5/minute',  # limit login attempts
         'register': '3/hour',  # limit registration attempts
     }
-}
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'UPDATE_LAST_LOGIN': False,
 }
