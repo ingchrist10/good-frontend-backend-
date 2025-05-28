@@ -22,3 +22,4 @@ Ensure the implementation adheres to modern security best practices, including:
 Provide the necessary Django project and app structure, `settings.py` configurations, serializers, views, and URL patterns."
 
 
+
