@@ -1,9 +1,10 @@
+from django.contrib import admin
 from django.urls import include, path
 from django.http import JsonResponse
 import pprint
 
 urlpatterns = [
-    # ...existing url patterns...
+    path('admin/', admin.site.urls),
 ]
 
 urlpatterns += [
