@@ -170,5 +170,12 @@ REST_FRAMEWORK = {
         'user': '1000/day',  # limit authenticated users to 1000 requests per day
         'login': '5/minute',  # limit login attempts
         'register': '3/hour',  # limit registration attempts
-    }
+    },
+    'EXCEPTION_HANDLER': 'authentication.utils.custom_exception_handler',
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ] if not DEBUG else [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ]
 }
