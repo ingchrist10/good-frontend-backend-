@@ -14,5 +14,4 @@ Ensure the implementation adheres to modern security best practices, including:
 * Robust **input validation** for all incoming data.
 * **Rate limiting/throttling** for API endpoints (especially login/registration).
 * Handling of **secrets via environment variables** (e.g., Django's `SECRET_KEY`).
-* Configuring **CORS (Cross-Origin Resource Sharing)** to allow specific origins.
-* Considerations for **HTTPS enforcement** in 
+* Configuring **CORS (Cross-Origin Resource Sharing)** to a
