@@ -42,6 +42,10 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         return user
 
+class GoogleAuthSerializer(serializers.Serializer):
+    access_token = serializers.CharField(required=True)
+    id_token = serializers.CharField(required=True)
+
 class SocialAccountSerializer(serializers.ModelSerializer):
     """Serializer for social accounts"""
     class Meta:
