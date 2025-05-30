@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from allauth.socialaccount.helpers import complete_social_login
+from allauth.socialaccount.models import SocialAccount
 import re
 
 User = get_user_model()
@@ -43,3 +45,16 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
+
+class SocialAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SocialAccount
+        fields = ('provider', 'uid', 'extra_data')
+
+class GoogleAuthSerializer(serializers.Serializer):
+    code = serializers.CharField(required=True)
+    
+    def validate_code(self, value):
+        if not value:
+            raise serializers.ValidationError('Authorization code is required')
+        return value
