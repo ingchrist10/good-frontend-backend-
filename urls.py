@@ -1,7 +1,7 @@
 """
 URL configuratiourlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('authentication.urls')),  # Changed from 'api/auth/' to '' to match the callback URL
+    path('auth/', include('authentication.urls')),  # Changed back to match the Google OAuth callback URL
 ]r analytix_hive_backend project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
