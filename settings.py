@@ -23,6 +23,11 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
+# Google OAuth Settings
+GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = env('GOOGLE_CLIENT_SECRET')
+GOOGLE_CALLBACK_URL = env('GOOGLE_CALLBACK_URL')
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
