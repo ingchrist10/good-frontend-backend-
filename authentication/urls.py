@@ -3,11 +3,15 @@ from .views import (
     RegisterView, 
     ProtectedView, 
     GoogleLoginView, 
-    GoogleCallback
+    GoogleCallback,
+    IndexView
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
+    # Landing page
+    path('', IndexView.as_view(), name='index'),
+    
     # JWT endpoints
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
