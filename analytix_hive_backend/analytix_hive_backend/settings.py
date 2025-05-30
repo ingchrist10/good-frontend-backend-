@@ -78,6 +78,8 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
     # Local apps
     "authentication",
 ]
@@ -221,3 +223,15 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_ON_GET = True
+
+# dj-rest-auth settings
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'auth',
+    'JWT_AUTH_REFRESH_COOKIE': 'refresh-auth',
+    'JWT_AUTH_SECURE': True,
+    'SESSION_LOGIN': False,
+}
+
+# Email settings (required for account verification)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
