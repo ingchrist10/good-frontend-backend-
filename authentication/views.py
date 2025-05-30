@@ -136,10 +136,14 @@ class GoogleCallback(APIView):
             token_data = response.json()
 
             if 'error' in token_data:
-                return Response(token_data, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': token_data['error']}, status=status.HTTP_400_BAD_REQUEST)
 
             # Verify ID token and get user info
             idinfo = id_token.verify_oauth2_token(
+                token_data['id_token'],
+                requests.Request(),
+                settings.GOOGLE_CLIENT_ID
+            )
                 token_data['id_token'],
                 requests.Request(),
                 settings.GOOGLE_CLIENT_ID
