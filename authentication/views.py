@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -11,6 +11,8 @@ from google.auth.transport import requests
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import get_user_model
 import requests as http_requests
+from urllib.parse import urlencode
+from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
 
