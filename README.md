@@ -8,5 +8,4 @@ The API should include:
 3.  **Token Refresh:** An endpoint to obtain a new access token using a valid refresh token, implementing **refresh token rotation** and **blacklisting of old tokens**.
 4.  **Protected Endpoint:** A sample API endpoint that requires a valid access token for access.
 
-Ensure the implementation adheres to modern security best practices, including:
-*
+Ensure the implementation adheres to modern se
