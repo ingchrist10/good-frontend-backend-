@@ -1,1 +1,1 @@
-building the backend in djan
+building the backend in django
