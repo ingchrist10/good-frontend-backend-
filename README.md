@@ -11,6 +11,4 @@ The API should include:
 Ensure the implementation adheres to modern security best practices, including:
 * **Stateless authentication** using JWTs.
 * Proper **password hashing**.
-* Robust **input validation** for all incoming data.
-* **Rate limiting/throttling** for API endpoints (especially login/registration).
-* Handling of **secrets via environment variables** (e.g., Django's `SECRET_KEY`)
+* Robust **in
