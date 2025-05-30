@@ -144,6 +144,43 @@ class GoogleCallback(APIView):
                 requests.Request(),
                 settings.GOOGLE_CLIENT_ID
             )
+
+            if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+                raise ValueError('Wrong issuer.')
+
+            # Get or create user
+            email = idinfo['email']
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    'username': email.split('@')[0],
+                    'profile_picture': idinfo.get('picture'),
+                    'google_id': idinfo['sub']
+                }
+            )
+
+            if not created:
+                # Update existing user's profile picture
+                user.profile_picture = idinfo.get('picture')
+                user.google_id = idinfo['sub']
+                user.save()
+
+            # Create or update social account
+            SocialAccount.objects.get_or_create(
+                user=user,
+                provider='google',
+                uid=idinfo['sub'],
+                defaults={'extra_data': idinfo}
+            )
+
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'user': UserSerializer(user).data,
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+            })
                 token_data['id_token'],
                 requests.Request(),
                 settings.GOOGLE_CLIENT_ID
