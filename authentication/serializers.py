@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from allauth.socialaccount.helpers import complete_social_login
 from allauth.socialaccount.models import SocialAccount
 import re
 
@@ -12,16 +11,15 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password']
+        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'profile_picture']
         extra_kwargs = {
             'password': {'write_only': True},
-            'username': {'min_length': 3}
+            'username': {'min_length': 3},
+            'profile_picture': {'read_only': True}
         }
 
     def validate_password(self, value):
-        """
-        Validate password strength
-        """
+        """Validate password strength"""
         if not re.search(r'[A-Z]', value):
             raise serializers.ValidationError('Password must contain at least one uppercase letter.')
         if not re.search(r'[a-z]', value):
@@ -33,9 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def validate_username(self, value):
-        """
-        Validate username format
-        """
+        """Validate username format"""
         if not re.match(r'^[a-zA-Z0-9_]+$', value):
             raise serializers.ValidationError(
                 'Username can only contain letters, numbers, and underscores.'
@@ -47,14 +43,8 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class SocialAccountSerializer(serializers.ModelSerializer):
+    """Serializer for social accounts"""
     class Meta:
         model = SocialAccount
         fields = ('provider', 'uid', 'extra_data')
-
-class GoogleAuthSerializer(serializers.Serializer):
-    code = serializers.CharField(required=True)
-    
-    def validate_code(self, value):
-        if not value:
-            raise serializers.ValidationError('Authorization code is required')
-        return value
+        read_only_fields = ('provider', 'uid', 'extra_data')
