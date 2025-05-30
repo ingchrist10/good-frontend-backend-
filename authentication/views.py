@@ -36,6 +36,22 @@ class GoogleLoginView(APIView):
     permission_classes = [AllowAny]
     serializer_class = GoogleAuthSerializer
 
+    def get(self, request):
+        # OAuth2 configuration
+        oauth2_params = {
+            'client_id': settings.GOOGLE_CLIENT_ID,
+            'redirect_uri': settings.GOOGLE_CALLBACK_URL,
+            'scope': 'email profile',
+            'response_type': 'code',
+            'access_type': 'offline',
+            'prompt': 'consent',
+        }
+        
+        # Construct Google OAuth2 URL
+        auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' + '&'.join([f'{key}={value}' for key, value in oauth2_params.items()])
+        
+        return Response({'authorization_url': auth_url})
+
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)

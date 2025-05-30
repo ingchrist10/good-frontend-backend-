@@ -1,5 +1,8 @@
 """
-URL configuration for analytix_hive_backend project.
+URL configuratiourlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('authentication.urls')),  # Changed from 'api/auth/' to '' to match the callback URL
+]r analytix_hive_backend project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
