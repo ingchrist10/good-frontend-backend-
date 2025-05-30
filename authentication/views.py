@@ -217,3 +217,9 @@ class ProtectedView(APIView):
                 "profile_picture": request.user.profile_picture
             }
         })
+
+class IndexView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return render(request, 'authentication/index.html')
