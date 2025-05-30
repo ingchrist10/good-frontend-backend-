@@ -43,7 +43,7 @@ class GoogleLoginView(APIView):
         # OAuth2 configuration
         oauth2_params = {
             'client_id': settings.GOOGLE_CLIENT_ID,
-            'redirect_uri': settings.GOOGLE_CALLBACK_URL,
+            'redirect_uri': 'http://localhost:8000/auth/google/callback',  # Hardcode the exact URL
             'scope': 'email profile openid',
             'response_type': 'code',
             'access_type': 'offline',
