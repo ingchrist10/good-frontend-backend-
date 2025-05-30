@@ -176,11 +176,28 @@ class GoogleCallback(APIView):
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             
-            return Response({
+            # For development, create a simple HTML response that shows the tokens
+            response_data = {
                 'user': UserSerializer(user).data,
                 'access_token': str(refresh.access_token),
                 'refresh_token': str(refresh),
-            })
+            }
+            
+            html_content = f"""
+            <html>
+                <head><title>Login Successful</title></head>
+                <body>
+                    <h1>Login Successful!</h1>
+                    <h2>User Info:</h2>
+                    <pre>{response_data['user']}</pre>
+                    <h2>Access Token:</h2>
+                    <pre>{response_data['access_token']}</pre>
+                    <h2>Refresh Token:</h2>
+                    <pre>{response_data['refresh_token']}</pre>
+                </body>
+            </html>
+            """
+            return HttpResponse(html_content)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
