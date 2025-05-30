@@ -4,5 +4,4 @@
 
 The API should include:
 1.  **User Registration:** An endpoint for new user sign-ups with secure password handling.
-2.  **User Login:** An endpoint that, upon successful credentials, returns both a short-lived **access token** and a longer-lived **refresh token**.
-3.  **Token Refresh:** An endpoint to obtain a new access token using a valid refresh token, implementing **re
+2.  **User Login:** An endpoint that, upon successful credentials, returns both a short-lived **access token** and a longer-lived **refres
