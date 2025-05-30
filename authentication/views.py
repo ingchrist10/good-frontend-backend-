@@ -1,15 +1,18 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from .serializers import UserSerializer, GoogleAuthSerializer
 from django.conf import settings
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from dj_rest_auth.registration.views import SocialLoginView
-from rest_framework_simplejwt.tokens import RefreshToken
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from allauth.socialaccount.models import SocialAccount
+from django.contrib.auth import get_user_model
+import requests as http_requests
+
+User = get_user_model()
 
 class LoginRateThrottle(AnonRateThrottle):
     rate = '5/minute'
@@ -29,33 +32,122 @@ class RegisterView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class GoogleLogin(SocialLoginView):
-    adapter_class = GoogleOAuth2Adapter
-    client_class = OAuth2Client
-    callback_url = settings.GOOGLE_CALLBACK_URL
-    
-    def get_response(self):
-        response = super().get_response()
-        if self.user:
-            # Update or create user profile data from Google
-            social_account = self.user.socialaccount_set.get(provider='google')
-            extra_data = social_account.extra_data
+class GoogleLoginView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = GoogleAuthSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            # Verify the Google token
+            idinfo = id_token.verify_oauth2_token(
+                serializer.validated_data['id_token'],
+                requests.Request(),
+                settings.GOOGLE_CLIENT_ID
+            )
+
+            if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+                raise ValueError('Wrong issuer.')
+
+            # Get or create user
+            email = idinfo['email']
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    'username': email.split('@')[0],
+                    'profile_picture': idinfo.get('picture'),
+                    'google_id': idinfo['sub']
+                }
+            )
+
+            if not created:
+                # Update existing user's profile picture
+                user.profile_picture = idinfo.get('picture')
+                user.google_id = idinfo['sub']
+                user.save()
+
+            # Create or update social account
+            SocialAccount.objects.get_or_create(
+                user=user,
+                provider='google',
+                uid=idinfo['sub'],
+                defaults={'extra_data': idinfo}
+            )
+
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
             
-            self.user.google_id = extra_data.get('sub')
-            self.user.profile_picture = extra_data.get('picture')
-            self.user.first_name = extra_data.get('given_name', '')
-            self.user.last_name = extra_data.get('family_name', '')
-            self.user.save()
-            
-            # Add user data to response
-            response.data['user'] = {
-                'id': self.user.id,
-                'email': self.user.email,
-                'first_name': self.user.first_name,
-                'last_name': self.user.last_name,
-                'profile_picture': self.user.profile_picture
+            return Response({
+                'user': UserSerializer(user).data,
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+            })
+
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class GoogleCallback(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        code = request.GET.get('code')
+        error = request.GET.get('error')
+
+        if error:
+            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not code:
+            return Response({'error': 'Code parameter missing'}, 
+                          status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Exchange the authorization code for tokens
+            token_url = 'https://oauth2.googleapis.com/token'
+            data = {
+                'code': code,
+                'client_id': settings.GOOGLE_CLIENT_ID,
+                'client_secret': settings.GOOGLE_CLIENT_SECRET,
+                'redirect_uri': settings.GOOGLE_CALLBACK_URL,
+                'grant_type': 'authorization_code'
             }
-        return response
+
+            response = http_requests.post(token_url, data=data)
+            token_data = response.json()
+
+            if 'error' in token_data:
+                return Response(token_data, status=status.HTTP_400_BAD_REQUEST)
+
+            # Verify ID token and get user info
+            idinfo = id_token.verify_oauth2_token(
+                token_data['id_token'],
+                requests.Request(),
+                settings.GOOGLE_CLIENT_ID
+            )
+
+            # Get or create user
+            email = idinfo['email']
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    'username': email.split('@')[0],
+                    'profile_picture': idinfo.get('picture'),
+                    'google_id': idinfo['sub']
+                }
+            )
+
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                'user': UserSerializer(user).data,
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+            })
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ProtectedView(APIView):
     permission_classes = [IsAuthenticated]
