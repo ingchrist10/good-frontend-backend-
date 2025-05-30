@@ -4,10 +4,13 @@ from django.db import models
 # Create your models here.
 
 class CustomUser(AbstractUser):
-    # Add custom fields
-    google_id = models.CharField(max_length=150, blank=True, null=True)
-    profile_picture = models.URLField(max_length=500, blank=True, null=True)
+    email = models.EmailField(unique=True)
+    google_id = models.CharField(max_length=255, null=True, blank=True)
+    profile_picture = models.URLField(max_length=512, null=True, blank=True)
     
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
     groups = models.ManyToManyField(
         Group,
         related_name="customuser_set",
@@ -24,4 +27,4 @@ class CustomUser(AbstractUser):
     )
 
     def __str__(self):
-        return self.email or self.username
+        return self.email
