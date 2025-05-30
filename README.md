@@ -17,4 +17,4 @@ Ensure the implementation adheres to modern security best practices, including:
 * Configuring **CORS (Cross-Origin Resource Sharing)** to allow specific origins.
 * Considerations for **HTTPS enforcement** in production.
 * **Graceful error handling** without exposing sensitive information.
-* Guidance on ensuring `DEBUG=False` in product
+* Guida
