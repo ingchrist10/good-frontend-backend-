@@ -9,6 +9,4 @@ The API should include:
 4.  **Protected Endpoint:** A sample API endpoint that requires a valid access token for access.
 
 Ensure the implementation adheres to modern security best practices, including:
-* **Stateless authentication** using JWTs.
-* Proper **password hashing**.
-* Robust **in
+*
