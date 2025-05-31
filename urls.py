@@ -9,7 +9,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('', include('authentication.urls')),  # Include the root URL pattern
     path('admin/', admin.site.urls),
-    path('auth/', include('authentication.urls')),  # For Google OAuth callback
+    path('auth/', include('authentication.urls')),  # All authentication routes under /auth/
 ]
