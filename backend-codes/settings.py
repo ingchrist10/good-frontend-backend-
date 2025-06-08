@@ -191,6 +191,6 @@ TEMPLATES = [
 ]
 
 # Updated allauth settings
-ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_LOGIN_METHODS = ['email']
+ACCOUNT_SIGNUP_FIELDS = ['email', 'password']
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # Change to 'mandatory' in production
