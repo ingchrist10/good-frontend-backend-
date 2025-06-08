@@ -56,3 +56,33 @@ Thumbs.db
 
 # Django REST framework
 api-docs/
+
+# Frontend - Next.js / Node
+frontend-codes/node_modules/
+frontend-codes/.next/
+frontend-codes/out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp
+.pnp.js
+
+# Coverage reports
+coverage/
+.coverage
+.coverage.*
+/htmlcov/
+nosetests.xml
+coverage.xml
+*,cover
+*.lcov
+
+# Build artifacts
+/build
+/dist
+/.angular/
+
+# Other
+.env.development
+.env.test
+.env.production
