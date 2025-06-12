@@ -101,3 +101,11 @@ coverage.xml
 .env.development
 .env.test
 .env.production
+backend-env/
+get-pip.py
+*.pyc
+__pycache__/
+backend-env/
+get-pip.py
+*.pyc
+__pycache__/
