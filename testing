@@ -1,0 +1,12 @@
+python manage.py migrate
+
+cd .. && pip install -r requirements.txt
+
+cd .. && python manage.py runserver 0.0.0.0:8000
+
+cd /workspaces/codespaces-blank/analytix-hive-backend && python manage.py runserver 0.0.0.0:8000
+
+cd analytix-hive-backend/frontend-codes && npm run dev
+
+
+sudo kill -9 $(lsof -t -i:3000) 2>/dev/null || true && sudo kill -9 $(lsof -t -i:8000) 2>/dev/null || true
